@@ -35,5 +35,3 @@ if __FILE__ == $0
   # Part 2 result
   puts missing[(missing.length / 2).floor()]
 end
-
-
