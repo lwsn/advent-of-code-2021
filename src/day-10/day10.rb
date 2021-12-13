@@ -12,13 +12,13 @@ if __FILE__ == $0
 
   corrupted = input.map {|l| l.split("").reduce([nil, []]) do |acc, c|
       if acc[0] != nil
-        next acc
+        acc
       elsif opener.include?(c)
-        next [nil, acc[1] << c]
+        [nil, acc[1] << c]
       elsif acc[1][-1] == opener[closer.index(c)]
-        next [nil, acc[1][0..-2]]
-        else
-        next [c]
+        [nil, acc[1][0..-2]]
+      else
+        [c]
       end
   end}.map {|l| l[0]}.map {|c| scoreA[closer.index(c)]}
 
@@ -27,16 +27,9 @@ if __FILE__ == $0
 
   missing = input.filter.with_index { |e, i|
     corrupted[i] == 0
-  }.map{|l| l.split("").reduce([]) do |acc, c|
-      if opener.include?(c)
-        next acc << c
-        else
-        next acc[0..-2]
-      end
-    end}.map{|l|
-      l.reverse().map {|c|
-        scoreB[opener.index(c)]
-      }.reduce(0) {|s, v| s * 5 + v }
+  }.map{|l| l.split("").reduce([]) {|acc, c|
+      opener.include?(c) ? acc << c : acc[0..-2]
+    }.reverse().map {|c| scoreB[opener.index(c)]} .reduce(0) {|s, v| s * 5 + v }
     }.sort()
 
   # Part 2 result
