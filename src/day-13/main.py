@@ -14,25 +14,19 @@ def loadInput():
     with open("./input") as f:
         for line in f:
             if "," in line:
-                coords.append(line)
+                coords.append(parseCoord(line))
             elif "=" in line:
-                folds.append(line)
-
-    folds = list(map(parseFold, folds))
-    coords = list(map(parseCoord, coords))
+                folds.append(parseFold(line))
 
     xmax, ymax = 0, 0
-
     for c in coords:
-        if c[0] > xmax:
-            xmax = c[0]
-        if c[1] > ymax:
-            ymax = c[1]
+        xmax = max(xmax, c[0])
+        ymax = max(ymax, c[1])
 
     board = [[0] * (xmax + 1) for _ in range(ymax + 1)]
 
-    for c in coords:
-        board[c[1]][c[0]] = 1
+    for x, y in coords:
+        board[y][x] = 1
 
     return board,  folds
 
@@ -42,10 +36,9 @@ def maybe(arr, i, d):
 
 
 def mergeRows(r1, r2):
-    newrow = range(max(len(r1), len(r2)))
     return list(map(
-        lambda i: maybe(r1, i, 0) | maybe(r2, i, 0),
-        newrow
+        lambda i: (maybe(r1, i, 0) | maybe(r2, i, 0)),
+        range(max(len(r1), len(r2)))
     ))
 
 
@@ -53,24 +46,20 @@ def foldY(board, coord):
     top = board[:coord][::-1]
     bottom = board[coord+1:]
 
-    newlength = max(len(top), len(bottom))
-
     return list(map(
         lambda i: mergeRows(maybe(top, i, []), maybe(bottom, i, [])),
-        range(newlength)
-    ))[::-1]
+        range(max(len(top), len(bottom)))
+    ))
 
 
 def foldRow(r, coord):
     left = r[:coord][::-1]
     right = r[coord+1:]
 
-    newlength = max(len(right), len(left))
-
     return list(map(
         lambda i: maybe(left, i, 0) | maybe(right, i, 0),
-        range(newlength)
-    ))[::-1]
+        range(max(len(right), len(left)))
+    ))
 
 
 def foldX(board, coord):
@@ -88,18 +77,13 @@ def doFold(board, fold):
 
 
 def doFolds(board, folds, num):
-    newBoard = board
     for f in folds[:num]:
-        newBoard = doFold(newBoard, f)
-    return newBoard
+        board = doFold(board, f)
+    return list(map(lambda r: r[::-1], board))[::-1]
 
 
 def countDots(board):
-    sum = 0
-    for r in board:
-        for v in r:
-            sum += v
-    return sum
+    return sum(map(lambda r: sum(r), board))
 
 
 def prettyPrint(board):
