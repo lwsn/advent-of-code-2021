@@ -1,9 +1,7 @@
 const input = require("./input.json").map((s) => s.split("").map(Number));
 
 const part1 = (list) => {
-  const grid = new Array(list.length)
-    .fill()
-    .map(() => new Array(list[0].length).fill(Infinity));
+  const grid = Array.from(list, () => Array.from(list[0], () => Infinity));
 
   let queue = [
     {
@@ -36,7 +34,7 @@ const part1 = (list) => {
 };
 
 const part2 = (list) => {
-  const five = new Array(5).fill(0).map((_, i) => i);
+  const five = [...Array(5).keys()];
   const newlist = five
     .reduce(
       (l, v) => [...l, ...list.map((r) => r.map((c) => ((c + v - 1) % 9) + 1))],
