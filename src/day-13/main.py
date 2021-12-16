@@ -4,17 +4,12 @@ def parseFold(s):
     return (axis, coord)
 
 
-def parseCoord(s):
-    x, y = map(int, s.split(","))
-    return (x, y)
-
-
 def loadInput():
     coords, folds = [], []
     with open("./input") as f:
         for line in f:
             if "," in line:
-                coords.append(parseCoord(line))
+                coords.append(tuple(map(int, line.split(","))))
             elif "=" in line:
                 folds.append(parseFold(line))
 
@@ -53,12 +48,9 @@ def foldY(board, coord):
 
 
 def foldRow(r, coord):
-    left = r[:coord][::-1]
-    right = r[coord+1:]
-
     return list(map(
-        lambda i: maybe(left, i, 0) | maybe(right, i, 0),
-        range(max(len(right), len(left)))
+        lambda i: maybe(r, coord - i, 0) | maybe(r, coord + i, 0),
+        range(1, max(coord, len(r) - coord))
     ))
 
 
