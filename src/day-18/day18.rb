@@ -96,9 +96,9 @@ class Pair
   end
 
   def split_left
-    if @left.is_a?(Pair)
-      return @left.do_splits
-    elsif @left > 9
+    return @left.do_splits if @left.is_a?(Pair)
+
+    if @left > 9
       @left = Pair.new(self, depth + 1, (@left / 2), @left - (@left / 2))
       return true
     end
@@ -106,9 +106,9 @@ class Pair
   end
 
   def split_right
-    if @right.is_a?(Pair)
-      return @right.do_splits
-    elsif @right > 9
+    return @right.do_splits if @right.is_a?(Pair)
+
+    if @right > 9
       @right = Pair.new(self, depth + 1, (@right / 2), @right - (@right / 2))
       return true
     end
@@ -120,7 +120,7 @@ class Pair
   end
 
   def to_s
-    '[' + @depth.to_s +  ': ' + @left.to_s + ', ' + @right.to_s + ']'
+    "[#{@left}, #{@right}]"
   end
 
   def *(other)
@@ -139,21 +139,30 @@ class Pair
   end
 end
 
-def parse_pair(pair)
+def next_depth(char, depth)
+  depth + (char == '[' && 1) || (char == ']' && -1) || 0
+end
+
+def root_comma_index(str)
   comma_index = 0
   depth = 0
 
+  str.split('').each do |c|
+    break if depth == 1 && c == ','
+
+    depth = next_depth(c, depth)
+    comma_index += 1
+  end
+
+  comma_index
+end
+
+def parse_pair(pair)
   return pair.to_i if pair.length == 1
 
   return [pair[1].to_i, pair[3].to_i] if pair.count(',') == 1
 
-  pair.split('').each do |c|
-    break if depth == 1 && c == ','
-
-    depth += (c == '[' && 1) || (c == ']' && -1) || 0
-    comma_index += 1
-  end
-
+  comma_index = root_comma_index(pair)
 
   [
     parse_pair(pair[1..comma_index - 1]),
@@ -168,14 +177,16 @@ if __FILE__ == $PROGRAM_NAME
 
   input = input.map { |s| parse_pair s }.map { |v| Pair.new(nil, 0, v[0], v[1]) }
 
-  # puts input.reduce(nil) { |acc, s| (acc.nil? ? s : acc + s).resolve }.magnitude
+  puts input.reduce(nil) { |acc, s| (acc.nil? ? s : acc + s).resolve }.magnitude
 
-  puts (input[0..-2]).each_with_index.reduce(0) do |acc, (p, i)|
-    return [
+  resb = input[0..-2].each_with_index.reduce(0) do |acc, (p, i)|
+    [
       acc,
-      input[i + 1..-1].map do |p2|
+      (input[i + 1..-1].map do |p2|
         [(p + p2).resolve.magnitude, (p2 + p).resolve.magnitude].max
-      end
+      end).max
     ].max
   end
+
+  puts resb
 end
