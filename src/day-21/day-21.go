@@ -1,11 +1,6 @@
 package main
 
-import (
-    "fmt"
-    "io/ioutil"
-    "strings"
-    "strconv"
-)
+import "fmt"
 
 func rollDice(start int) (int, int) {
     sum := 0
@@ -36,6 +31,7 @@ func part1(positions [2]int) {
     fmt.Println(score[player] * numDice)
 }
 
+// Unused, generated roll outcome frequency map
 func generateOutcomes() map[int]int {
     rolls := [3]int{1, 2, 3}
     outcomes := map[int]int {}
@@ -87,14 +83,14 @@ func part2(positions [2]int) {
 }
 
 func main() {
-    input, _ := ioutil.ReadFile("./input")
+    startPos := [2]int{ 7, 6 }
+    // Can read from input file, but why?
+    // input, _ := ioutil.ReadFile("./input")
 
-    startPos := [2]int{ 0, 0 }
-
-    for i, s := range strings.Split(strings.TrimSuffix(string(input), "\n"), "\n") {
-        tmp, _ := strconv.ParseInt(s[len(s)-1:], 10, 64)
-        startPos[i] = int(tmp)
-    }
+    // for i, s := range strings.Split(strings.TrimSuffix(string(input), "\n"), "\n") {
+    //     tmp, _ := strconv.ParseInt(s[len(s)-1:], 10, 64)
+    //     startPos[i] = int(tmp)
+    // }
 
     part1(startPos)
     part2(startPos)
